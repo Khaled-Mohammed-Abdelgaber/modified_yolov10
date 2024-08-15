@@ -17,6 +17,10 @@ from torch.utils.data import Dataset
 from ultralytics.utils import DEFAULT_CFG, LOCAL_RANK, LOGGER, NUM_THREADS, TQDM
 from .utils import HELP_URL, IMG_FORMATS
 
+import torch
+import torch.nn.functional as F
+from PIL import Image
+import torchvision.transforms as transforms
 
 class BaseDataset(Dataset):
     """
@@ -144,7 +148,7 @@ class BaseDataset(Dataset):
             if self.single_cls:
                 self.labels[i]["cls"][:, 0] = 0
 
-    def load_image(self, i, rect_mode=True):
+    def load_image(self, i, rect_mode=True,):
         """Loads 1 image from dataset index 'i', returns (im, resized hw)."""
         im, f, fn = self.ims[i], self.im_files[i], self.npy_files[i]
         if im is None:  # not cached in RAM
@@ -272,8 +276,90 @@ class BaseDataset(Dataset):
     def update_labels_info(self, label):
         """Custom your label format here."""
         return label
-
+    def lbp(img_rgb):
+    
+        img_gray =img_rgb.convert('L')
+        img_gray=np.asarray(img_gray)
+        [Rows,Cols]=img_gray.shape
+        
+        #np.array(a).astype(np.uint8).transpose(1,2,0)
+        
+        x =torch.from_numpy(img_gray.reshape(1,Rows,Cols).astype(np.uint8)).to('cuda')
+        
+        
+        #pad image for 3x3 mask size
+        x = F.pad(input=x, pad = [1, 1, 1, 1], mode='constant')
+        b=x.shape
+        M=b[1]
+        N=b[2]
+        
+        y=x
+        #select elements within 3x3 mask 
+        # y00  y01  y02
+        # y10  y11  y12
+        # y20  y21  y22
+        
+        y00=y[:,0:M-2, 0:N-2]
+        y01=y[:,0:M-2, 1:N-1]
+        y02=y[:,0:M-2, 2:N  ]
+        #     
+        y10=y[:,1:M-1, 0:N-2]
+        y11=y[:,1:M-1, 1:N-1]
+        y12=y[:,1:M-1, 2:N  ]
+        #
+        y20=y[:,2:M, 0:N-2]
+        y21=y[:,2:M, 1:N-1]
+        y22=y[:,2:M, 2:N ]      
+        
+           
+        
+        # Comparisons 
+        # 1 ---------------------------------
+        bit=torch.ge(y01,y11)
+        tmp=torch.mul(bit,torch.tensor(1)) 
+        
+        # 2 ---------------------------------
+        bit=torch.ge(y02,y11)
+        val=torch.mul(bit,torch.tensor(2))
+        val=torch.add(val,tmp)    
+        
+        # 3 ---------------------------------
+        bit=torch.ge(y12,y11)
+        tmp=torch.mul(bit,torch.tensor(4))
+        val=torch.add(val,tmp)
+        
+        # 4 --------------------------------- 
+        bit=torch.ge(y22,y11)
+        tmp=torch.mul(bit,torch.tensor(8))   
+        val=torch.add(val,tmp)
+        
+        # 5 ---------------------------------
+        bit=torch.ge(y21,y11)
+        tmp=torch.mul(bit,torch.tensor(16))   
+        val=torch.add(val,tmp)
+        
+        # 6 ---------------------------------
+        bit=torch.ge(y20,y11)
+        tmp=torch.mul(bit,torch.tensor(32))   
+        val=torch.add(val,tmp)
+        
+        # 7 ---------------------------------
+        bit=torch.ge(y10,y11)
+        tmp=torch.mul(bit,torch.tensor(64))   
+        val=torch.add(val,tmp)
+        
+        # 8 ---------------------------------
+        bit=torch.ge(y00,y11)
+        tmp=torch.mul(bit,torch.tensor(128))   
+        val=torch.add(val,tmp)    
+        return val.type('torch.FloatTensor')
     def build_transforms(self, hyp=None):
+        
+        return Compose([transforms.Lambda(self.lbp),
+                        transforms.ToPILImage(),
+                        transforms.Resize((self.imgsz, self.imgsz), Image.BICUBIC),
+                        transforms.ToTensor(),
+                            ])
         """
         Users can customize augmentations here.
 
@@ -287,7 +373,7 @@ class BaseDataset(Dataset):
                 return Compose([])
             ```
         """
-        raise NotImplementedError
+        #raise NotImplementedError
 
     def get_labels(self):
         """
