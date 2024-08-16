@@ -171,7 +171,7 @@ class YOLODataset(BaseDataset):
                 bgr=hyp.bgr if self.augment else 0.0,  # only affect training.
             )
         )
-        if ext_transform != None:
+        if self.ext_transform != None:
             transforms.append(self.ext_transform)
         return transforms
 
