@@ -57,6 +57,7 @@ def lbp(img):
 
 class ext_transformer:
   def __init__(self, func = lbp):
+    print("External Transformer has been called")
     self.func = func
   def __call__(self):
     return transforms.Lambda(self.func)
