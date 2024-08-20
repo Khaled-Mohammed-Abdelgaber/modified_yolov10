@@ -45,7 +45,8 @@ def lbp(img_dict):
   y20, y21, y22 = x[:, 2:M, 0:N-2], x[:, 2:M, 1:N-1], x[:, 2:M, 2:N]
   print("=================== 6 ===========================")
   # Pre-create weights for the bitwise comparisons
-  weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], device='cuda', dtype=torch.uint8)
+  #weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], device='cuda', dtype=torch.uint8)
+  weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], dtype=torch.uint8)
   print("=================== 7 ===========================")
   # Perform the LBP calculation using bitwise operations
   comparisons = torch.stack([
