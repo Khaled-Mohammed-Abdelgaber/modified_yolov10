@@ -6,6 +6,7 @@ import numpy as np
 
 def lbp(img):
   # Check if the input is a PIL Image, if so, convert to grayscale
+  print(img)
   if isinstance(img, Image.Image):
       img_gray = img.convert('L')
       img_gray = np.asarray(img_gray)
