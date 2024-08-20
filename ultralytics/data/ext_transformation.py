@@ -29,10 +29,10 @@ def lbp(img_dict):
     else:
         raise ValueError("Input must be a PIL Image or NumPy array.")"""
   
-  Rows, Cols = img_gray.shape
+  Rows, Cols = img_gray.shape[1:]
   
   # Convert the grayscale image to a PyTorch tensor and move it to the GPU
-  x = torch.from_numpy(img_gray.reshape(1, Rows, Cols).astype(np.uint8)).to('cuda')
+  x = img_gray.to(torch.uint8).to('cuda')
   
   # Pad the image to accommodate the 3x3 mask
   x = F.pad(input=x, pad=[1, 1, 1, 1], mode='constant')
