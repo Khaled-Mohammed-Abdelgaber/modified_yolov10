@@ -99,7 +99,7 @@ def lbp(img_dict):
   val=torch.add(val,tmp).type('torch.FloatTensor')
   
   #print("=================== 9 ===========================")
-  img_dict['img'] = val
+  img_dict['img'] = val.repeat(3, 1, 1)
   #print("=================== 10 ===========================")
   return img_dict
 
