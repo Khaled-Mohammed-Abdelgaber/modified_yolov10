@@ -7,21 +7,27 @@ import numpy as np
 def lbp(img_dict):
   # Check if the input is a PIL Image, if so, convert to grayscale
   img = img_dict['img']
-  print(img)
-  if isinstance(img, Image.Image):
-      img_gray = img.convert('L')
-      img_gray = np.asarray(img_gray)
-  elif isinstance(img, np.ndarray):
-      # If it's a NumPy array, check if it's RGB and convert to grayscale
-      if len(img.shape) == 3 and img.shape[2] == 3:  # RGB image
-          img_gray = Image.fromarray(img).convert('L')
-          img_gray = np.asarray(img_gray)
-      elif len(img.shape) == 2:  # Already grayscale
-          img_gray = img
-      else:
-          raise ValueError("Unsupported NumPy array shape.")
-  else:
-      raise ValueError("Input must be a PIL Image or NumPy array.")
+  print(img.shape)
+  # Define transform
+  transform = transforms.Grayscale()
+   
+  # Convert the image to grayscale
+  img_gray = transform(img)
+  
+  """if isinstance(img, Image.Image):
+        img_gray = img.convert('L')
+        img_gray = np.asarray(img_gray)
+    elif isinstance(img, np.ndarray):
+        # If it's a NumPy array, check if it's RGB and convert to grayscale
+        if len(img.shape) == 3 and img.shape[2] == 3:  # RGB image
+            img_gray = Image.fromarray(img).convert('L')
+            img_gray = np.asarray(img_gray)
+        elif len(img.shape) == 2:  # Already grayscale
+            img_gray = img
+        else:
+            raise ValueError("Unsupported NumPy array shape.")
+    else:
+        raise ValueError("Input must be a PIL Image or NumPy array.")"""
   
   Rows, Cols = img_gray.shape
   
