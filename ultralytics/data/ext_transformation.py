@@ -96,10 +96,10 @@ def lbp(img_dict):
   # 8 ---------------------------------
   bit=torch.ge(y00,y11)
   tmp=torch.mul(bit,torch.tensor(128))   
-  val=torch.add(val,tmp).type('torch.FloatTensor')
-  
+  val=torch.add(val,tmp).type('torch.FloatTensor').repeat(3, 1, 1)
+  print("val shape = ",val.shape)
   #print("=================== 9 ===========================")
-  img_dict['img'] = val.repeat(3, 1, 1)
+  img_dict['img'] = val
   #print("=================== 10 ===========================")
   return img_dict
 
