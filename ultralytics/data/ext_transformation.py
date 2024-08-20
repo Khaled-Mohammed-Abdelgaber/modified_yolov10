@@ -32,38 +32,74 @@ def lbp(img_dict):
   Rows, Cols = img_gray.shape[1:]
   #print("=================== 2 ===========================")
   # Convert the grayscale image to a PyTorch tensor and move it to the GPU
-  x = img_gray.to(torch.uint8)#.to('cuda')
-  #print("=================== 3 ===========================")
-  # Pad the image to accommodate the 3x3 mask
-  x = F.pad(input=x, pad=[1, 1, 1, 1], mode='constant')
-  #print("=================== 4 ===========================")
-  M, N = x.shape[1], x.shape[2]
-  #print("=================== 5 ===========================")
-  # Extract the 3x3 neighborhoods
-  y00, y01, y02 = x[:, 0:M-2, 0:N-2], x[:, 0:M-2, 1:N-1], x[:, 0:M-2, 2:N]
-  y10, y11, y12 = x[:, 1:M-1, 0:N-2], x[:, 1:M-1, 1:N-1], x[:, 1:M-1, 2:N]
-  y20, y21, y22 = x[:, 2:M, 0:N-2], x[:, 2:M, 1:N-1], x[:, 2:M, 2:N]
-  #print("=================== 6 ===========================")
-  # Pre-create weights for the bitwise comparisons
-  #weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], device='cuda', dtype=torch.uint8)
-  weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], dtype=torch.uint8)
-  #print("=================== 7 ===========================")
-  # Perform the LBP calculation using bitwise operations
-  comparisons = torch.stack([
-      torch.ge(y01, y11),
-      torch.ge(y02, y11),
-      torch.ge(y12, y11),
-      torch.ge(y22, y11),
-      torch.ge(y21, y11),
-      torch.ge(y20, y11),
-      torch.ge(y10, y11),
-      torch.ge(y00, y11)
-  ], dim=0).type(torch.uint8)
-  #print("=================== 8 ===========================")
-  # Calculate the LBP value by summing the weighted bit comparisons
-  lbp_value = torch.sum(comparisons * weights.view(-1, 1, 1), dim=0)
+  #pad image for 3x3 mask size
+  x = F.pad(input=x, pad = [1, 1, 1, 1], mode='constant')
+  b=x.shape
+  M=b[1]
+  N=b[2]
+  
+  y=x
+  #select elements within 3x3 mask 
+  # y00  y01  y02
+  # y10  y11  y12
+  # y20  y21  y22
+  
+  y00=y[:,0:M-2, 0:N-2]
+  y01=y[:,0:M-2, 1:N-1]
+  y02=y[:,0:M-2, 2:N  ]
+  #     
+  y10=y[:,1:M-1, 0:N-2]
+  y11=y[:,1:M-1, 1:N-1]
+  y12=y[:,1:M-1, 2:N  ]
+  #
+  y20=y[:,2:M, 0:N-2]
+  y21=y[:,2:M, 1:N-1]
+  y22=y[:,2:M, 2:N ]      
+  
+     
+  
+  # Comparisons 
+  # 1 ---------------------------------
+  bit=torch.ge(y01,y11)
+  tmp=torch.mul(bit,torch.tensor(1)) 
+  
+  # 2 ---------------------------------
+  bit=torch.ge(y02,y11)
+  val=torch.mul(bit,torch.tensor(2))
+  val=torch.add(val,tmp)    
+  
+  # 3 ---------------------------------
+  bit=torch.ge(y12,y11)
+  tmp=torch.mul(bit,torch.tensor(4))
+  val=torch.add(val,tmp)
+  
+  # 4 --------------------------------- 
+  bit=torch.ge(y22,y11)
+  tmp=torch.mul(bit,torch.tensor(8))   
+  val=torch.add(val,tmp)
+  
+  # 5 ---------------------------------
+  bit=torch.ge(y21,y11)
+  tmp=torch.mul(bit,torch.tensor(16))   
+  val=torch.add(val,tmp)
+  
+  # 6 ---------------------------------
+  bit=torch.ge(y20,y11)
+  tmp=torch.mul(bit,torch.tensor(32))   
+  val=torch.add(val,tmp)
+  
+  # 7 ---------------------------------
+  bit=torch.ge(y10,y11)
+  tmp=torch.mul(bit,torch.tensor(64))   
+  val=torch.add(val,tmp)
+  
+  # 8 ---------------------------------
+  bit=torch.ge(y00,y11)
+  tmp=torch.mul(bit,torch.tensor(128))   
+  val=torch.add(val,tmp).type('torch.FloatTensor')
+  
   #print("=================== 9 ===========================")
-  img_dict['img'] = lbp_value.type(torch.FloatTensor)
+  img_dict['img'] = val
   #print("=================== 10 ===========================")
   return img_dict
 
