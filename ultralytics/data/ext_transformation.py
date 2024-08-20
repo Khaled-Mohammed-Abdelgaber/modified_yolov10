@@ -7,30 +7,17 @@ import numpy as np
 def lbp(img_dict):
   # Check if the input is a PIL Image, if so, convert to grayscale
   img = img_dict['img']
-  #print("input image shape ",img.shape)
+  
   # Define transform
   transform = transforms.Grayscale()
    
   # Convert the image to grayscale
   img_gray = transform(img)
-  #print("img_gray shape ",img_gray.shape)
-  """if isinstance(img, Image.Image):
-        img_gray = img.convert('L')
-        img_gray = np.asarray(img_gray)
-    elif isinstance(img, np.ndarray):
-        # If it's a NumPy array, check if it's RGB and convert to grayscale
-        if len(img.shape) == 3 and img.shape[2] == 3:  # RGB image
-            img_gray = Image.fromarray(img).convert('L')
-            img_gray = np.asarray(img_gray)
-        elif len(img.shape) == 2:  # Already grayscale
-            img_gray = img
-        else:
-            raise ValueError("Unsupported NumPy array shape.")
-    else:
-        raise ValueError("Input must be a PIL Image or NumPy array.")"""
-  #print("=================== 1 ===========================")
+  
+  
+  
   Rows, Cols = img_gray.shape[1:]
-  #print("=================== 2 ===========================")
+  
   # Convert the grayscale image to a PyTorch tensor and move it to the GPU
   #pad image for 3x3 mask size
   x = F.pad(input=img_gray, pad = [1, 1, 1, 1], mode='constant')
@@ -97,10 +84,10 @@ def lbp(img_dict):
   bit=torch.ge(y00,y11)
   tmp=torch.mul(bit,torch.tensor(128))   
   val=torch.add(val,tmp).type('torch.FloatTensor').repeat(3, 1, 1)
-  print("val shape = ",val.shape)
-  #print("=================== 9 ===========================")
+  
+  
   img_dict['img'] = val
-  #print("=================== 10 ===========================")
+  
   return img_dict
 
 
