@@ -1,7 +1,8 @@
 import torchvision.transforms as transforms
+import torch
 import torch.nn.functional as F
 from PIL import Image
-import torch
+import numpy as np
 
 def lbp(img):
   # Check if the input is a PIL Image, if so, convert to grayscale
