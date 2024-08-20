@@ -4,8 +4,9 @@ import torch.nn.functional as F
 from PIL import Image
 import numpy as np
 
-def lbp(img):
+def lbp(img_dict):
   # Check if the input is a PIL Image, if so, convert to grayscale
+  img = img_dict['img']
   print(img)
   if isinstance(img, Image.Image):
       img_gray = img.convert('L')
@@ -53,8 +54,8 @@ def lbp(img):
   
   # Calculate the LBP value by summing the weighted bit comparisons
   lbp_value = torch.sum(comparisons * weights.view(-1, 1, 1), dim=0)
-  
-  return lbp_value.type(torch.FloatTensor)
+  img_dict['img'] = lbp_value.type(torch.FloatTensor)
+  return img_dict
 
 
 class ext_transformer:
