@@ -14,7 +14,8 @@ from ultralytics.nn.tasks import DetectionModel
 from ultralytics.utils import LOGGER, RANK
 from ultralytics.utils.plotting import plot_images, plot_labels, plot_results
 from ultralytics.utils.torch_utils import de_parallel, torch_distributed_zero_first
-from ultralytics.data.ext_transfromation import ext_transformer
+from ultralytics.data.ext_transformation import ext_transformer
+
 
 class DetectionTrainer(BaseTrainer):
     """
