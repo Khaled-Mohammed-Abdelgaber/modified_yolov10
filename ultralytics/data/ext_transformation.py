@@ -33,7 +33,7 @@ def lbp(img_dict):
   #print("=================== 2 ===========================")
   # Convert the grayscale image to a PyTorch tensor and move it to the GPU
   #pad image for 3x3 mask size
-  x = F.pad(input=x, pad = [1, 1, 1, 1], mode='constant')
+  x = F.pad(input=img_gray, pad = [1, 1, 1, 1], mode='constant')
   b=x.shape
   M=b[1]
   N=b[2]
