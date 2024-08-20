@@ -28,24 +28,25 @@ def lbp(img_dict):
             raise ValueError("Unsupported NumPy array shape.")
     else:
         raise ValueError("Input must be a PIL Image or NumPy array.")"""
-  
+  print("=================== 1 ===========================")
   Rows, Cols = img_gray.shape[1:]
-  
+  print("=================== 1 ===========================")
   # Convert the grayscale image to a PyTorch tensor and move it to the GPU
-  x = img_gray.to(torch.uint8).to('cuda')
-  
+  x = img_gray.to(torch.uint8)#.to('cuda')
+  print("=================== 1 ===========================")
   # Pad the image to accommodate the 3x3 mask
   x = F.pad(input=x, pad=[1, 1, 1, 1], mode='constant')
+  print("=================== 1 ===========================")
   M, N = x.shape[1], x.shape[2]
-  
+  print("=================== 1 ===========================")
   # Extract the 3x3 neighborhoods
   y00, y01, y02 = x[:, 0:M-2, 0:N-2], x[:, 0:M-2, 1:N-1], x[:, 0:M-2, 2:N]
   y10, y11, y12 = x[:, 1:M-1, 0:N-2], x[:, 1:M-1, 1:N-1], x[:, 1:M-1, 2:N]
   y20, y21, y22 = x[:, 2:M, 0:N-2], x[:, 2:M, 1:N-1], x[:, 2:M, 2:N]
-  
+  print("=================== 1 ===========================")
   # Pre-create weights for the bitwise comparisons
   weights = torch.tensor([1, 2, 4, 8, 16, 32, 64, 128], device='cuda', dtype=torch.uint8)
-  
+  print("=================== 1 ===========================")
   # Perform the LBP calculation using bitwise operations
   comparisons = torch.stack([
       torch.ge(y01, y11),
@@ -57,10 +58,12 @@ def lbp(img_dict):
       torch.ge(y10, y11),
       torch.ge(y00, y11)
   ], dim=0).type(torch.uint8)
-  
+  print("=================== 1 ===========================")
   # Calculate the LBP value by summing the weighted bit comparisons
   lbp_value = torch.sum(comparisons * weights.view(-1, 1, 1), dim=0)
+  print("=================== 1 ===========================")
   img_dict['img'] = lbp_value.type(torch.FloatTensor)
+  print("=================== 1 ===========================")
   return img_dict
 
 
