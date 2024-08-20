@@ -13,7 +13,7 @@ def lbp(img_dict):
    
   # Convert the image to grayscale
   img_gray = transform(img)
-  print("img_gray shape ",img.shape)
+  print("img_gray shape ",img_gray.shape)
   """if isinstance(img, Image.Image):
         img_gray = img.convert('L')
         img_gray = np.asarray(img_gray)
